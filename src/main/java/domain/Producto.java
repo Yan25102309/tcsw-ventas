@@ -13,7 +13,7 @@ public final class Producto {
             throw new IllegalArgumentException("El identificador debe ser mayor que cero");
         }
         if (nombre == null || nombre.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre es obligatorio y no puede estar vacío");
+            throw new IllegalArgumentException("El nombre es obligatorio y no puede estar vacio");
         }
         if (precio == null || precio.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("El precio no puede ser negativo");
