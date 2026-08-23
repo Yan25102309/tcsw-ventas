@@ -1,0 +1,17 @@
+# Maven - Archivos temporales y compilados
+target/
+*.pom.properties
+*.pom
+
+# Editores de codigo e IDEs (VS Code, IntelliJ, Eclipse)
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+.vscode/
+.metadata/
+
+# Temporales del sistema operativo
+Thumbs.db
+desktop.ini
