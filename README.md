@@ -34,6 +34,11 @@ Antes de ejecutar cualquier comando, debes asegurar que tu computadora (Windows 
   * **Version Requerida:** 2.54.0 (o superior)
   * **Comando de Verificacion:** `git --version`
   * **Resultado Esperado en Consola:** `git version 2.54.0.windows.1` o similar.
+
+* **Docker Destopk**
+  * **Version Requerida:** LTS(Actualizado)
+  * **Comando de Verificacion:** `docker --version`
+  * **Resultado Esperado en Consola:** `Docker version 29.5.3` o similar
 ```
 
 ```
@@ -147,6 +152,38 @@ mvn clean package
 *   **Resultado esperado:**  
     En tu directorio raíz aparecerá la carpeta `/target/` y dentro de ella verás el archivo empaquetado final:  
     `target/tcsw-ventas-1.0-SNAPSHOT.jar`
+
+---
+
+## 6. Guía Reproducible de Auditoría de Calidad con SonarQube
+
+Para asegurar que el código no posee *Bugs*, *Vulnerabilidades* ni *Code Smells* (malas prácticas de desarrollo), siga detalladamente estos pasos de análisis:
+
+### Paso 1: Descargar e iniciar el contenedor de SonarQube
+Inicie el servidor oficial de SonarQube aislado en un contenedor local de Docker ejecutando desde PowerShell (deberá tener instaldo previamente Docker Desktop y tenerlo encendido):
+```bash
+docker run -d --name sonarqube -p 9000:9000 sonarqube:lts-community
+```
+
+### Paso 2: Configurar el proyecto en SonarQube
+1. Espere un minuto e ingrese en su navegador web a la dirección: `http://localhost:9000`.
+2. Inicie sesión utilizando las credenciales por defecto (Usuario: `admin` / Contraseña: `admin`) y actualice la contraseña.
+3. Haga clic en **Create Project** -> **Manually**.
+4. Defina el identificador del proyecto (`Project key` y `Display name`) como **`tcsw-ventas`**.
+5. Seleccione la opción de análisis **Locally**, asigne un nombre a su token de acceso y haga clic en **Generate** (copie el token alfanumérico largo proporcionado).
+
+### Paso 3: Ejecutar el análisis desde Maven
+Desde la terminal en la raíz de su proyecto, ejecute el siguiente comando (sustituya `<TU_TOKEN_SONAR>` por el token real copiado anteriormente):
+
+```bash
+mvn clean verify sonar:sonar "-Dsonar.projectKey=tcsw-ventas" "-Dsonar.host.url=http://localhost:9000" "-Dsonar.login=<TU_TOKEN_SONAR>"
+```
+
+### Paso 4: Consultar resultados de calidad estática
+Regrese a su navegador en `http://localhost:9000` y acceda al panel de `tcsw-ventas`. Deberá visualizar un estado de aprobación:
+*   **Bugs:** 0
+*   **Vulnerabilidades:** 0
+*   **Code Smells:** 0
 
 ---
 
