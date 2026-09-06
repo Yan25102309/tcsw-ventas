@@ -13,7 +13,7 @@ public final class Venta {
             throw new IllegalArgumentException("El producto no puede ser nulo");
         }
         if (cantidad <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser positiva");
+            throw new IllegalArgumentException("Error de validacion: El valor ingresado (" + cantidad + ") no esta permitido en partidas");
         }
         producto.descontar(cantidad);
         this.detalles.add(new DetalleVenta(producto, cantidad));
