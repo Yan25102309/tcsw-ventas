@@ -1,6 +1,7 @@
 package application.service;
 
 import adapter.memory.InMemoryProductoRepository;
+import application.port.in.RegistrarProductoCommand;
 import domain.Producto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,10 @@ class ProductoServiceTest {
 
     @Test
     void testRegistrarProductoExitoso() {
-        Producto creado = productoService.registrarProducto(1L, "Café Veracruz", new BigDecimal("120.50"), 10);
+        RegistrarProductoCommand comando = new RegistrarProductoCommand(
+            1L, "Café Veracruz", new BigDecimal("120.50"), 10
+        );
+        Producto creado = productoService.registrarProducto(comando);
         assertNotNull(creado);
         assertEquals("Café Veracruz", creado.getNombre());
     }

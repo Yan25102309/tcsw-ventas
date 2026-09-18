@@ -1,9 +1,9 @@
 package application.service;
 
 import application.ProductoRepository;
+import application.port.in.RegistrarProductoCommand;
 import application.port.in.RegistrarProductoUseCase;
 import domain.Producto;
-import java.math.BigDecimal;
 import java.util.Objects;
 
 public class ProductoService implements RegistrarProductoUseCase {
@@ -15,8 +15,14 @@ public class ProductoService implements RegistrarProductoUseCase {
     }
 
     @Override
-    public Producto registrarProducto(Long id, String nombre, BigDecimal precio, int existencia) {
-        Producto producto = new Producto(id, nombre, precio, existencia);
+    public Producto registrarProducto(RegistrarProductoCommand comando) {
+        Objects.requireNonNull(comando, "El comando no puede ser nulo");
+        Producto producto = new Producto(
+            comando.getId(),
+            comando.getNombre(),
+            comando.getPrecio(),
+            comando.getExistencia()
+        );
         return productoRepository.guardar(producto);
     }
 }
