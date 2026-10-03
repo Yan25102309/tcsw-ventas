@@ -1,10 +1,11 @@
 # Contribución Individual - Integrante 1
 
 * **Estudiante:** Reyes Vidal Victor Gustavo
-* **Rol:** Integrante 1
-* **Issue Asignado:** #1 (Prueba de Integración E2E para el Corte 1)
-* **Rama Git:** `feat/c01-prueba-e2e`
+* **Rol:** Integrante 1 (Formulario de Registro de Productos)[cite: 45]
+* **Rama Git:** `feat/p07-swing-registro-mvc`[cite: 45]
 * **Entregables:**
-  * `src/test/java/integration/Corte1IntegracionTest.java`
-* **Resumen de Contribución:**
-  Se implementó la prueba de integración punta a punta que valida la cadena completa de la Arquitectura Hexagonal y patrones de diseño del Corte 1: Caso de Uso (`RegistrarProductoUseCase`), Servicio (`ProductoService`), Adaptador de Infraestructura (`InMemoryProductoRepository`), Dominio (`Venta`, `Producto`), Factory Method (`PoliticaDescuentoFactory`) y Strategy (`DescuentoClienteFrecuente`).
+  - `src/main/java/adapter/swing/RegistrarProductoView.java`[cite: 45]
+  - `src/main/java/adapter/swing/ProductoController.java`[cite: 45]
+  - `src/test/java/adapter/swing/ProductoControllerTest.java`[cite: 45]
+* **Resumen:**
+  Implementación de la interfaz gráfica Swing y controlador MVC para el alta de productos, comunicándose con la Fachada de Aplicación (`RegistrarProductoUseCase`) mediante objetos neutros DTO (`RegistrarProductoCommand`)[cite: 45].
