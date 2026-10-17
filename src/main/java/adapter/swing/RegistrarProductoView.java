@@ -22,6 +22,12 @@ public class RegistrarProductoView extends JPanel {
         add(txtExistencia);
         add(new JLabel(""));
         add(btnGuardar);
+
+        txtId.getAccessibleContext().setAccessibleName("Campo ID de producto");
+        txtNombre.getAccessibleContext().setAccessibleName("Campo Nombre de producto");
+        txtPrecio.getAccessibleContext().setAccessibleName("Campo Precio de producto");
+        txtExistencia.getAccessibleContext().setAccessibleName("Campo Existencia de producto");
+        btnGuardar.getAccessibleContext().setAccessibleName("Botón Guardar producto");
     }
 
     public String getIdText() { return txtId.getText(); }
@@ -29,6 +35,11 @@ public class RegistrarProductoView extends JPanel {
     public String getPrecioText() { return txtPrecio.getText(); }
     public String getExistenciaText() { return txtExistencia.getText(); }
     public JButton getBtnGuardar() { return btnGuardar; }
+
+    public void setIdText(String id) { txtId.setText(id); }
+    public void setNombreText(String nombre) { txtNombre.setText(nombre); }
+    public void setPrecioText(String precio) { txtPrecio.setText(precio); }
+    public void setExistenciaText(String existencia) { txtExistencia.setText(existencia); }
 
     public void limpiarCampos() {
         txtId.setText("");
