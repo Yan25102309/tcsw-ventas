@@ -5,6 +5,7 @@ import application.port.in.RegistrarProductoUseCase;
 import domain.Producto;
 
 import javax.swing.*;
+import java.awt.GraphicsEnvironment;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -13,8 +14,8 @@ public class ProductoController {
     private final RegistrarProductoUseCase facadeUseCase;
 
     public ProductoController(RegistrarProductoView view, RegistrarProductoUseCase facadeUseCase) {
-        this.view = Objects.requireNonNull(view);
-        this.facadeUseCase = Objects.requireNonNull(facadeUseCase);
+        this.view = Objects.requireNonNull(view, "La vista no puede ser nula");
+        this.facadeUseCase = Objects.requireNonNull(facadeUseCase, "El puerto de entrada no puede ser nulo");
         this.view.getBtnGuardar().addActionListener(e -> procesarRegistro());
     }
 
@@ -28,14 +29,20 @@ public class ProductoController {
             RegistrarProductoCommand command = new RegistrarProductoCommand(id, nombre, precio, existencia);
             Producto registrado = facadeUseCase.registrarProducto(command);
 
-            JOptionPane.showMessageDialog(view, "Producto '" + registrado.getNombre() + "' registrado con éxito.",
+            mostrarMensaje("Producto '" + registrado.getNombre() + "' registrado con éxito.",
                     "Éxito", JOptionPane.INFORMATION_MESSAGE);
             view.limpiarCampos();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(view, "Error de Formato: Ingrese valores válidos en ID, Precio y Existencia.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            mostrarMensaje("Error: Ingrese valores numéricos válidos en ID, Precio y Existencia.",
+                    "Entrada Inválida", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(view, ex.getMessage(), "Error de Dominio", JOptionPane.ERROR_MESSAGE);
+            mostrarMensaje(ex.getMessage(), "Error de Dominio", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void mostrarMensaje(String mensaje, String titulo, int tipo) {
+        if (!GraphicsEnvironment.isHeadless()) {
+            JOptionPane.showMessageDialog(view, mensaje, titulo, tipo);
         }
     }
 }
