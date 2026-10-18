@@ -3,7 +3,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-public class SwingAppTest {
+class SwingAppTest {
     @BeforeAll
     static void setUpHeadlessMode() {
         // Evita errores de entorno gráfico en servidores de CI/CD
