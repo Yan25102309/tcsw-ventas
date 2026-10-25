@@ -1,0 +1,21 @@
+services:
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: tcsw_ventas_db
+    environment:
+      POSTGRES_DB: ventas_db
+      POSTGRES_USER: ventas_user
+      POSTGRES_PASSWORD: ventas_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infrastructure/database/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ventas_user -d ventas_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
