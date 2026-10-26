@@ -3,6 +3,7 @@ package adapter.jdbc;
 import application.ProductoRepository;
 import domain.Producto;
 import infrastructure.db.DatabaseConfig;
+import infrastructure.exception.PersistenceException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,7 +32,7 @@ public class ProductoJdbcRepository implements ProductoRepository {
             ps.executeUpdate();
             return producto;
         } catch (SQLException e) {
-            throw new RuntimeException("Error en persistencia JDBC al guardar Producto", e);
+            throw new PersistenceException("Error en persistencia JDBC al guardar Producto", e);
         }
     }
 
@@ -53,7 +54,7 @@ public class ProductoJdbcRepository implements ProductoRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error en consulta JDBC al buscar Producto por ID", e);
+            throw new PersistenceException("Error en consulta JDBC al buscar Producto por ID", e);
         }
         return Optional.empty();
     }
@@ -74,7 +75,7 @@ public class ProductoJdbcRepository implements ProductoRepository {
                 ));
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error en consulta JDBC al obtener todos los productos", e);
+            throw new PersistenceException("Error en consulta JDBC al obtener todos los productos", e);
         }
         return productos;
     }
