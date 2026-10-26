@@ -22,7 +22,9 @@ public class ProductoEntity {
     @Column(nullable = false)
     private Integer existencia;
 
-    public ProductoEntity() {}
+    public ProductoEntity() {
+        // Constructor sin argumentos requerido por la especificacion JPA/Hibernate
+    }
 
     public ProductoEntity(Long id, String nombre, BigDecimal precio, Integer existencia) {
         this.id = id;
@@ -31,9 +33,19 @@ public class ProductoEntity {
         this.existencia = existencia;
     }
 
-    public Long getId() { return id; }
-    public String getNombre() { return nombre; }
-    public BigDecimal getPrecio() { return precio; }
-    public Integer getExistencia() { return existencia; }
-}
+    public Long getId() {
+        return id;
+    }
 
+    public String getNombre() {
+        return nombre;
+    }
+
+    public BigDecimal getPrecio() {
+        return precio;
+    }
+
+    public Integer getExistencia() {
+        return existencia;
+    }
+}

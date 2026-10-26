@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,5 +47,19 @@ class ProductoJdbcRepositoryTest {
             Producto invalido = new Producto(501L, "Error", new BigDecimal("-10.00"), 5);
             repository.guardar(invalido);
         });
+    }
+
+    @Test
+    @DisplayName("Debe rechazar guardar un producto nulo")
+    void testGuardarProductoNuloLanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class, () -> repository.guardar(null));
+    }
+
+    @Test
+    @DisplayName("Debe obtener todos los productos registrados en JDBC")
+    void testObtenerTodosRetornaLista() {
+        List<Producto> lista = repository.obtenerTodos();
+        assertNotNull(lista);
+        assertFalse(lista.isEmpty());
     }
 }
