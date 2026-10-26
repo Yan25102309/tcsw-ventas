@@ -7,13 +7,14 @@
 ---
 
 ## 1. Responsabilidades Asignadas y Resueltas
-1. **Configuración de Conexión Segura (S30):** Implementé `DatabaseConfig.java` abstrayendo los parámetros de conexión a través de variables de entorno con valores por defecto seguros.
-2. **Adaptador JDBC con PreparedStatement (M10):** Construí `ProductoJdbcRepository.java` cumpliendo el contrato de `ProductoRepository` con consultas SQL parametrizadas, gestión determinista de conexiones mediante `try-with-resources` y sentencias upsert (`ON CONFLICT (id) DO UPDATE`).
-3. **Desacoplamiento Hexagonal:** Mantuve la capa de dominio y aplicación totalmente aisladas de librerías de persistencia relacional (`java.sql.*`).
+1. **Configuración de Conexión Segura (S30):** Implementé `DatabaseConfig.java` abstrayendo los parámetros de conexión a través de variables de entorno sanitizadas (`DB_URL`, `DB_USER`, `DB_PASSWORD`).
+2. **Adaptador JDBC con PreparedStatement (M10):** Construí `ProductoJdbcRepository.java` satisfaciendo el contrato de `ProductoRepository` con consultas SQL parametrizadas, gestión determinista mediante `try-with-resources` y sentencias upsert (`ON CONFLICT (id) DO UPDATE`).
+3. **Suite de Pruebas Automatizadas (Issue #43):** Diseñé `ProductoJdbcRepositoryTest.java` validando persistencia real, búsquedas con `Optional.empty()` y rechazo de violaciones de integridad.
+4. **Reporte Integrador:** Redacté `docs/P08-persistencia-jdbc.md` documentando las decisiones de diseño hexagonal y el protocolo de pruebas.
 
 ---
 
 ## 2. Decisiones Técnicas y Axiología
-* **Prevención de Inyección SQL:** Uso estricto de `PreparedStatement` con marcadores posicionales para todos los parámetros de entrada.
-* **Control de Fugas de Recursos:** Toda conexión, declaración y conjunto de resultados se cierran deterministamente dentro del bloque de gestión de recursos.
-* **Protección de Credenciales:** Ninguna contraseña productiva o dato sensible fue incluido en el código fuente.
+* **Prevención de Inyecciones SQL:** Uso estricto de consultas parametrizadas con marcadores de posición posicionales.
+* **Control de Fugas:** Cierre garantizado de descriptores relacionales mediante `try-with-resources`.
+* **Aislamiento Hexagonal:** Capas `domain` y `application` 100% puras y libres de tipos de infraestructura (`java.sql.*`).
