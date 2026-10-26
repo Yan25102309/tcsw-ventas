@@ -2,6 +2,7 @@ package adapter.hibernate;
 
 import application.ProductoRepository;
 import domain.Producto;
+import infrastructure.exception.PersistenceException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -40,7 +41,7 @@ public class ProductoHibernateRepository implements ProductoRepository {
             if (tx != null) {
                 tx.rollback();
             }
-            throw new RuntimeException("Error en transacción Hibernate al guardar Producto", e);
+            throw new PersistenceException("Error en transacción Hibernate al guardar Producto", e);
         }
     }
 
@@ -58,7 +59,7 @@ public class ProductoHibernateRepository implements ProductoRepository {
                 return Optional.of(producto);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error en consulta Hibernate al buscar Producto por ID", e);
+            throw new PersistenceException("Error en consulta Hibernate al buscar Producto por ID", e);
         }
         return Optional.empty();
     }
@@ -78,7 +79,7 @@ public class ProductoHibernateRepository implements ProductoRepository {
             }
             return productos;
         } catch (Exception e) {
-            throw new RuntimeException("Error en consulta Hibernate al obtener todos los productos", e);
+            throw new PersistenceException("Error en consulta Hibernate al obtener todos los productos", e);
         }
     }
 }
