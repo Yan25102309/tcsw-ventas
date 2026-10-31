@@ -32,11 +32,9 @@ public class VentaHibernateRepository implements VentaRepository {
         try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
 
-            // 1. Crear VentaEntity asignando un ID de transacción y usando tu venta.calcularTotal()
             long ventaId = System.currentTimeMillis();
             VentaEntity ventaEntity = new VentaEntity(ventaId, LocalDateTime.now(), venta.calcularTotal());
 
-            // 2. Mapear cada DetalleVenta a DetalleVentaEntity
             long detalleCounter = 1;
             for (DetalleVenta detalle : venta.getDetalles()) {
                 ProductoEntity productoEntity = session.get(ProductoEntity.class, detalle.getProducto().getId());
@@ -56,13 +54,19 @@ public class VentaHibernateRepository implements VentaRepository {
                 ventaEntity.agregarDetalle(detalleEntity);
             }
 
-            // 3. Persistir el agregado completo en PostgreSQL
             session.saveOrUpdate(ventaEntity);
             tx.commit();
             return venta;
         } catch (Exception e) {
             if (tx != null) {
-                tx.rollback();
+                try {
+                    tx.rollback();
+                } catch (Exception rollbackEx) {
+                    // Evita que la excepción del rollback tape la excepción raíz
+                }
+            }
+            if (e instanceof PersistenceException) {
+                throw (PersistenceException) e;
             }
             throw new PersistenceException("Error al guardar la Venta en Hibernate", e);
         }
@@ -104,7 +108,6 @@ public class VentaHibernateRepository implements VentaRepository {
                     d.getProducto().getPrecio(),
                     d.getProducto().getExistencia()
             );
-            // Llama a tu método exacto agregarDetalle(Producto, int) de Venta.java
             venta.agregarDetalle(producto, d.getCantidad());
         }
         return venta;
