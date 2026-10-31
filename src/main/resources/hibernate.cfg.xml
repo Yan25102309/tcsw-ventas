@@ -10,7 +10,9 @@
         <property name="hibernate.connection.password">ventas_password</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL10Dialect</property>
         <property name="hibernate.show_sql">true</property>
-        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
         <mapping class="adapter.hibernate.ProductoEntity"/>
+        <mapping class="adapter.hibernate.VentaEntity"/>
+        <mapping class="adapter.hibernate.DetalleVentaEntity"/>
     </session-factory>
 </hibernate-configuration>
