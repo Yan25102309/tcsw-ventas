@@ -1,7 +1,10 @@
 package adapter.swing;
 
-import adapter.memory.InMemoryProductoRepository;
+import adapter.hibernate.ProductoHibernateRepository;
+import adapter.hibernate.VentaHibernateRepository;
+import application.ConfirmarVentaService;
 import application.ProductoRepository;
+import application.VentaRepository;
 import application.port.in.RegistrarProductoUseCase;
 import application.service.ProductoService;
 import domain.Venta;
@@ -29,10 +32,13 @@ public final class SwingApp {
     public static void createAndShowGui() {
         configureLookAndFeel();
 
-        ProductoRepository repository = new InMemoryProductoRepository();
-        RegistrarProductoUseCase useCase = new ProductoService(repository);
+        ProductoRepository productoRepository = new ProductoHibernateRepository();
+        VentaRepository ventaRepository = new VentaHibernateRepository();
 
-        JFrame frame = new JFrame("Sistema de Ventas tcsw-ventas (P07)");
+        RegistrarProductoUseCase useCase = new ProductoService(productoRepository);
+        ConfirmarVentaService ventaService = new ConfirmarVentaService(ventaRepository, productoRepository);
+
+        JFrame frame = new JFrame("Sistema de Ventas tcsw-ventas (C02 - Swing + Hibernate)");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setSize(850, 550);
         frame.setLocationRelativeTo(null);
@@ -44,7 +50,7 @@ public final class SwingApp {
         tabbedPane.addTab("Registro de Productos", registroView);
 
         VentaView ventaView = new VentaView();
-        new VentaController(ventaView, new Venta());
+        new VentaController(ventaView, new Venta(), ventaService);
         tabbedPane.addTab("Procesar Venta", ventaView);
 
         frame.add(tabbedPane, BorderLayout.CENTER);
