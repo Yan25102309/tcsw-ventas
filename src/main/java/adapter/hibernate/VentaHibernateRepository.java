@@ -4,6 +4,7 @@ import application.VentaRepository;
 import domain.DetalleVenta;
 import domain.Producto;
 import domain.Venta;
+import infrastructure.db.DatabaseConfig;
 import infrastructure.exception.PersistenceException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -20,7 +21,12 @@ public class VentaHibernateRepository implements VentaRepository {
     private final SessionFactory sessionFactory;
 
     public VentaHibernateRepository() {
-        this.sessionFactory = new Configuration().configure().buildSessionFactory();
+        this.sessionFactory = new Configuration()
+                .configure()
+                .setProperty("hibernate.connection.url", DatabaseConfig.getUrl())
+                .setProperty("hibernate.connection.username", DatabaseConfig.getUser())
+                .setProperty("hibernate.connection.password", DatabaseConfig.getPassword())
+                .buildSessionFactory();
     }
 
     @Override

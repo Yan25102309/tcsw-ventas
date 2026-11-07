@@ -5,9 +5,9 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/ventas_db</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5434/ventas_db</property>
         <property name="hibernate.connection.username">ventas_user</property>
-        <property name="hibernate.connection.password">ventas_password</property>
+        <property name="hibernate.connection.password"></property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL10Dialect</property>
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>

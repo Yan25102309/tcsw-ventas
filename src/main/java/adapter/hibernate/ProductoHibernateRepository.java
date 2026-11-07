@@ -2,6 +2,7 @@ package adapter.hibernate;
 
 import application.ProductoRepository;
 import domain.Producto;
+import infrastructure.db.DatabaseConfig;
 import infrastructure.exception.PersistenceException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -17,7 +18,12 @@ public class ProductoHibernateRepository implements ProductoRepository {
     private final SessionFactory sessionFactory;
 
     public ProductoHibernateRepository() {
-        this.sessionFactory = new Configuration().configure().buildSessionFactory();
+        this.sessionFactory = new Configuration()
+                .configure()
+                .setProperty("hibernate.connection.url", DatabaseConfig.getUrl())
+                .setProperty("hibernate.connection.username", DatabaseConfig.getUser())
+                .setProperty("hibernate.connection.password", DatabaseConfig.getPassword())
+                .buildSessionFactory();
     }
 
     @Override

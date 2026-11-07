@@ -1,6 +1,7 @@
 package adapter.swing;
 
 import application.ConfirmarVentaService;
+import application.ProductoRepository;
 import domain.*;
 
 import javax.swing.*;
@@ -17,15 +18,23 @@ public class VentaController {
     private final VentaView view;
     private final Venta venta;
     private final ConfirmarVentaService ventaService;
+    private final ProductoRepository productoRepository;
 
     public VentaController(VentaView view, Venta venta, ConfirmarVentaService ventaService) {
+        this(view, venta, ventaService, null);
+    }
+
+    public VentaController(VentaView view, Venta venta, ConfirmarVentaService ventaService,
+                           ProductoRepository productoRepository) {
         this.view = Objects.requireNonNull(view, "La vista no puede ser nula");
         this.venta = Objects.requireNonNull(venta, "La venta no puede ser nula");
         this.ventaService = Objects.requireNonNull(ventaService, "El servicio de venta no puede ser nulo");
+        this.productoRepository = productoRepository;
 
         if (this.view.getBtnCalcularTotal() != null) {
             this.view.getBtnCalcularTotal().addActionListener(e -> calcularTotalAsincrono());
         }
+        this.view.getBtnAgregarProducto().addActionListener(e -> agregarProductoDesdeVista());
     }
 
     public void agregarProductoAVenta(Producto producto, int cantidad) {
@@ -63,13 +72,11 @@ public class VentaController {
                     view.marcarListo("Venta calculada y persistida con éxito.");
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
-                    JOptionPane.showMessageDialog(view, "La operación fue interrumpida.",
-                            "Advertencia", JOptionPane.WARNING_MESSAGE);
+                    mostrarAdvertencia("La operación fue interrumpida.");
                     view.marcarListo("Operación interrumpida.");
                 } catch (ExecutionException ex) {
                     Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
-                    JOptionPane.showMessageDialog(view, "No fue posible procesar la venta: " + cause.getMessage(),
-                            "Error de Cálculo / Persistencia", JOptionPane.ERROR_MESSAGE);
+                    mostrarError("No fue posible procesar la venta: " + cause.getMessage());
                     view.marcarListo("Error al procesar.");
                 }
             }
@@ -77,6 +84,41 @@ public class VentaController {
 
         worker.execute();
     }
+
+    private void agregarProductoDesdeVista() {
+        try {
+            if (productoRepository == null) {
+                throw new IllegalStateException("No hay un repositorio de productos configurado.");
+            }
+            String idTexto = view.getProductoIdText();
+            String cantidadTexto = view.getCantidadText();
+            if (idTexto.isEmpty() || cantidadTexto.isEmpty()) {
+                throw new IllegalArgumentException("Ingrese el ID del producto y la cantidad.");
+            }
+            long id = Long.parseLong(idTexto);
+            int cantidad = Integer.parseInt(cantidadTexto);
+            Producto producto = productoRepository.buscarPorId(id)
+                    .orElseThrow(() -> new IllegalArgumentException("No existe un producto con ID " + id + "."));
+            agregarProductoAVenta(producto, cantidad);
+            view.limpiarEntradasProducto();
+            view.marcarListo("Producto agregado a la venta.");
+        } catch (NumberFormatException ex) {
+            mostrarError("El ID y la cantidad deben ser números enteros válidos.");
+        } catch (Exception ex) {
+            mostrarError(ex.getMessage() == null ? "No fue posible agregar el producto." : ex.getMessage());
+        }
+    }
+
+    private void mostrarError(String mensaje) {
+        view.marcarListo("Error: " + mensaje);
+        if (!java.awt.GraphicsEnvironment.isHeadless()) {
+            JOptionPane.showMessageDialog(view, mensaje, "Entrada inválida", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void mostrarAdvertencia(String mensaje) {
+        if (!java.awt.GraphicsEnvironment.isHeadless()) {
+            JOptionPane.showMessageDialog(view, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }
+    }
 }
-
-

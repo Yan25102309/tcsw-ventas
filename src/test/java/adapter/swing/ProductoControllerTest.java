@@ -53,6 +53,25 @@ class ProductoControllerTest {
     }
 
     @Test
+    void testProcesarRegistroExitosoMuestraProductoEnTabla() {
+        RegistrarProductoUseCase stubFacade = cmd ->
+                new Producto(cmd.getId(), cmd.getNombre(), cmd.getPrecio(), cmd.getExistencia());
+        RegistrarProductoView view = new RegistrarProductoView();
+        ProductoController controller = new ProductoController(view, stubFacade);
+
+        view.setIdText("11");
+        view.setNombreText("Teclado");
+        view.setPrecioText("250");
+        view.setExistenciaText("3");
+
+        controller.procesarRegistro();
+
+        assertEquals(1, view.getTableModel().getRowCount());
+        assertEquals("Teclado", view.getTableModel().getValueAt(0, 1));
+        assertEquals(3, view.getTableModel().getValueAt(0, 3));
+    }
+
+    @Test
     void testProcesarRegistroConErrorDeFormatoConservaCampos() {
         RegistrarProductoUseCase stubFacade = cmd ->
                 new Producto(cmd.getId(), cmd.getNombre(), cmd.getPrecio(), cmd.getExistencia());

@@ -46,6 +46,20 @@ Antes de ejecutar cualquier comando, debes asegurar que tu computadora (Windows 
 > **IMPORTANTE (La trampa común):**  
 > A veces, al ejecutar `mvn -version`, Maven reporta que está usando otra versión de Java instalada en tu equipo (como Java 17 o 21), aunque tu terminal use Java 11. **Ambos deben usar Java 11** para evitar problemas de compilación. Si no coinciden, debes ajustar tu variable de entorno `JAVA_HOME` en Windows.
 
+### Credenciales de base de datos
+
+Las credenciales no están almacenadas en el repositorio. Antes de iniciar PostgreSQL
+o la aplicación, define las variables de entorno requeridas en PowerShell:
+
+```powershell
+$env:POSTGRES_PASSWORD = "<contraseña segura>"
+$env:DB_PASSWORD = $env:POSTGRES_PASSWORD
+$env:DB_URL = "jdbc:postgresql://localhost:5434/ventas_db"
+```
+
+`docker compose` rechazará el inicio si `POSTGRES_PASSWORD` no está definida, y la
+aplicación fallará explícitamente si `DB_PASSWORD` está ausente o vacía.
+
 ---
 
 ## 2. Estructura Exacta del Proyecto

@@ -11,6 +11,7 @@ import domain.Venta;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -26,7 +27,13 @@ public final class SwingApp {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(SwingApp::createAndShowGui);
+        SwingUtilities.invokeLater(() -> {
+            try {
+                createAndShowGui();
+            } catch (RuntimeException exception) {
+                handleStartupFailure(exception);
+            }
+        });
     }
 
     public static void createAndShowGui() {
@@ -46,11 +53,11 @@ public final class SwingApp {
         JTabbedPane tabbedPane = new JTabbedPane();
 
         RegistrarProductoView registroView = new RegistrarProductoView();
-        new ProductoController(registroView, useCase);
+        new ProductoController(registroView, useCase, productoRepository);
         tabbedPane.addTab("Registro de Productos", registroView);
 
         VentaView ventaView = new VentaView();
-        new VentaController(ventaView, new Venta(), ventaService);
+        new VentaController(ventaView, new Venta(), ventaService, productoRepository);
         tabbedPane.addTab("Procesar Venta", ventaView);
 
         frame.add(tabbedPane, BorderLayout.CENTER);
@@ -62,6 +69,20 @@ public final class SwingApp {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception exception) {
             LOGGER.log(Level.WARNING, "No se pudo configurar el Look and Feel del sistema.", exception);
+        }
+    }
+
+    private static void handleStartupFailure(RuntimeException exception) {
+        LOGGER.log(Level.SEVERE, "No se pudo iniciar la aplicación Swing.", exception);
+        if (!java.awt.GraphicsEnvironment.isHeadless()) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "No se pudo iniciar la aplicación.\n"
+                            + "Verifica DB_PASSWORD, DB_URL y que PostgreSQL esté activo.\n\n"
+                            + exception.getMessage(),
+                    "Error de inicio",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }
