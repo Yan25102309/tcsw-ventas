@@ -1,0 +1,48 @@
+openapi: 3.1.0
+info:
+  title: API de Ventas tcsw-ventas
+  description: Contrato de servicios REST para la gestión de productos y confirmación atómica de ventas.
+  version: 1.0.0
+paths:
+  /api/v1/productos:
+    get:
+      summary: Consultar todos los productos
+      responses:
+        '200':
+          description: Lista de productos obtenida exitosamente
+    post:
+      summary: Registrar un nuevo producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearProductoRequest'
+      responses:
+        '201':
+          description: Producto creado exitosamente
+        '400':
+          description: Datos de entrada inválidos
+components:
+  schemas:
+    CrearProductoRequest:
+      type: object
+      required:
+        - id
+        - nombre
+        - precio
+        - existencia
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 101
+        nombre:
+          type: string
+          example: "Teclado Mecánico"
+        precio:
+          type: number
+          example: 450.50
+        existencia:
+          type: integer
+          example: 15
