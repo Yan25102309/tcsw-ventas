@@ -1,20 +1,20 @@
-# Reporte de Contribución Individual — P08 (M10 / S28-S30)
+# Reporte de Contribución Individual — P09 (M12 / S34-S36)
 
 * **Estudiante:** Victor Gustavo Reyes Vidal (`Novaxll` — Estudiante 2)
 * **Proyecto:** `tcsw-ventas` (EE: Tecnologías para la Construcción de Software)
-* **Rama de Trabajo:** `feat/p08-adaptador-jdbc-producto` y `docs/p08-pruebas-reporte-integrador`
+* **Rama de Trabajo:** `feat/p09-api-exception-handler-ventas`
 
 ---
 
 ## 1. Responsabilidades Asignadas y Resueltas
-1. **Configuración de Conexión Segura (S30):** Implementé `DatabaseConfig.java` abstrayendo los parámetros de conexión a través de variables de entorno sanitizadas (`DB_URL`, `DB_USER`, `DB_PASSWORD`).
-2. **Adaptador JDBC con PreparedStatement (M10):** Construí `ProductoJdbcRepository.java` satisfaciendo el contrato de `ProductoRepository` con consultas SQL parametrizadas, gestión determinista mediante `try-with-resources` y sentencias upsert (`ON CONFLICT (id) DO UPDATE`).
-3. **Suite de Pruebas Automatizadas (Issue #43):** Diseñé `ProductoJdbcRepositoryTest.java` validando persistencia real, búsquedas con `Optional.empty()` y rechazo de violaciones de integridad.
-4. **Reporte Integrador:** Redacté `docs/P08-persistencia-jdbc.md` documentando las decisiones de diseño hexagonal y el protocolo de pruebas.
+1. **Manejador Global de Errores (S36):** Implementé `ApiExceptionHandler` anotado con `@RestControllerAdvice` y el DTO `ErrorResponse` conforme al estándar **Problem Details (RFC 9457)**, garantizando respuestas uniformes y sanitizadas.
+2. **DTOs de Venta:** Diseñé `ConfirmarVentaRequest` y `DetalleVentaRequest` con validaciones declarativas `@Valid`, `@NotNull`, `@Min` y `@NotEmpty`.
+3. **Controlador REST de Ventas (S34/S35):** Desarrollé `VentaRestController` exponiendo `POST /api/v1/ventas` y delegando la transacción en el caso de uso `ConfirmarVentaService`.
+4. **Bootstrap y Composition Root:** Implementé `RestApp` (`@SpringBootApplication`) configurando los Beans de infraestructura para la inyección de dependencias hexagonal.
+5. **Suite de Pruebas Unitarias HTTP:** Desarrollé `VentaRestControllerTest` utilizando `MockMvc` aislado con *fakes*, comprobando respuestas `201 Created`, `400 Bad Request`, `409 Conflict` y `500 Internal Server Error`.
 
 ---
 
 ## 2. Decisiones Técnicas y Axiología
-* **Prevención de Inyecciones SQL:** Uso estricto de consultas parametrizadas con marcadores de posición posicionales.
-* **Control de Fugas:** Cierre garantizado de descriptores relacionales mediante `try-with-resources`.
-* **Aislamiento Hexagonal:** Capas `domain` y `application` 100% puras y libres de tipos de infraestructura (`java.sql.*`).
+* **Sanitización de Errores:** Erradicación total de exposición de trazas de pila (*stack traces*), dialectos relacionales o datos sensibles hacia los clientes web.
+* **Calidad Estática:** Pruebas JUnit 5 con visibilidad de paquete (*package-private*) resolviendo la regla SonarQube `java:S5786`.
