@@ -1,0 +1,83 @@
+@baseUrl = http://localhost:8080
+@productoId = 101
+
+### 1. Consulta general de productos — 200 OK
+GET {{baseUrl}}/api/v1/productos
+Accept: application/json
+
+### 2. Registro de producto válido — 201 Created
+POST {{baseUrl}}/api/v1/productos
+Content-Type: application/json
+
+{
+  "id": {{productoId}},
+  "nombre": "Teclado Mecánico",
+  "precio": 450.50,
+  "existencia": 15
+}
+
+### 3. Registro de producto inválido — 400 Bad Request
+POST {{baseUrl}}/api/v1/productos
+Content-Type: application/json
+
+{
+  "id": 0,
+  "nombre": "",
+  "precio": -1,
+  "existencia": -1
+}
+
+### 4. Consulta de producto existente — 200 OK
+GET {{baseUrl}}/api/v1/productos/{{productoId}}
+Accept: application/json
+
+### 5. Consulta de producto inexistente — 404 Not Found
+GET {{baseUrl}}/api/v1/productos/999999
+Accept: application/json
+
+### 6. Confirmación de venta válida — 201 Created
+POST {{baseUrl}}/api/v1/ventas
+Content-Type: application/json
+
+{
+  "detalles": [
+    {
+      "productoId": {{productoId}},
+      "cantidad": 2
+    }
+  ]
+}
+
+### 7. Venta con cantidad mayor al stock — 409 Conflict
+POST {{baseUrl}}/api/v1/ventas
+Content-Type: application/json
+
+{
+  "detalles": [
+    {
+      "productoId": {{productoId}},
+      "cantidad": 999999
+    }
+  ]
+}
+
+### 8. Venta inválida sin detalles — 400 Bad Request
+POST {{baseUrl}}/api/v1/ventas
+Content-Type: application/json
+
+{
+  "detalles": []
+}
+
+### 9. Venta con producto inexistente — 500 Internal Server Error sanitizado
+POST {{baseUrl}}/api/v1/ventas
+Content-Type: application/json
+
+{
+  "detalles": [
+    {
+      "productoId": 999999,
+      "cantidad": 1
+    }
+  ]
+}
