@@ -1,0 +1,39 @@
+.tabla-contenedor {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.tabla-productos {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.tabla-productos th,
+.tabla-productos td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tabla-productos th {
+  background-color: #f7fafc;
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.badge-existencia {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #e6fffa;
+  color: #234e52;
+  font-size: 0.875rem;
+}
+
+.alerta-stock {
+  background-color: #fff5f5;
+  color: #9b2c2c;
+  font-weight: bold;
+}

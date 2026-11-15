@@ -1,0 +1,24 @@
+<div class="tabla-contenedor">
+  <table class="tabla-productos" aria-label="Catálogo de Productos Disponibles">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Nombre del Producto</th>
+        <th scope="col">Precio Unitario</th>
+        <th scope="col">Existencia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let prod of productos">
+        <td>{{ prod.id }}</td>
+        <td><strong>{{ prod.nombre }}</strong></td>
+        <td>{{ prod.precio | currency:'MXN':'symbol':'1.2-2' }}</td>
+        <td>
+          <span [class.alerta-stock]="prod.existencia < 5" class="badge-existencia">
+            {{ prod.existencia }} unidades
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
