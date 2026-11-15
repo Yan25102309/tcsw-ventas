@@ -1,0 +1,28 @@
+<section class="pagina-productos" aria-labelledby="titulo-seccion">
+  <header class="encabezado-seccion">
+    <h1 id="titulo-seccion">Catálogo de Productos</h1>
+    <a routerLink="/productos/nuevo" class="btn-primary" aria-label="Registrar un nuevo producto en el sistema">
+      + Registrar Producto
+    </a>
+  </header>
+
+  <!-- Estado: Cargando -->
+  <div *ngIf="estadoUi.tipo === 'loading'" class="caja-estado estado-loading" role="status">
+    <p>⏳ Cargando productos desde el servidor backend...</p>
+  </div>
+
+  <!-- Estado: Error -->
+  <div *ngIf="estadoUi.tipo === 'error'" class="caja-estado estado-error" role="alert">
+    <p>⚠️ Error al cargar el catálogo: {{ estadoUi.mensajeError }}</p>
+    <button (click)="cargarProductos()" class="btn-secundario">Reintentar</button>
+  </div>
+
+  <!-- Estado: Vacío -->
+  <div *ngIf="estadoUi.tipo === 'empty'" class="caja-estado estado-vacio">
+    <p>📭 No hay productos registrados en la base de datos.</p>
+  </div>
+
+  <!-- Estado: Éxito (Muestra componente de lista) -->
+  <app-producto-list *ngIf="estadoUi.tipo === 'success'" [productos]="productos">
+  </app-producto-list>
+</section>

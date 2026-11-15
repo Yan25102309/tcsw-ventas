@@ -15,3 +15,13 @@ target/
 # Temporales del sistema operativo
 Thumbs.db
 desktop.ini
+
+# Variables de entorno y secretos
+.env
+.env.*
+
+# Frontend Angular builds y dependencias
+frontend-angular/dist/
+frontend-angular/node_modules/
+frontend-angular/.angular/
+frontend-angular/coverage/
