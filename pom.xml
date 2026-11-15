@@ -92,6 +92,15 @@
 
     <build>
         <plugins>
+            <!-- Plugin Spring Boot para ejecutar la API con mvn spring-boot:run -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <configuration>
+                    <mainClass>infrastructure.RestApp</mainClass>
+                </configuration>
+            </plugin>
             <!-- Plugin Surefire para que Maven reconozca y ejecute los tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
