@@ -1,0 +1,45 @@
+<section class="formulario-contenedor" aria-labelledby="titulo-form">
+  <header>
+    <h1 id="titulo-form">Registrar Nuevo Producto</h1>
+  </header>
+
+  <div *ngIf="mensajeError" class="alerta-error" role="alert">
+    ⚠️ {{ mensajeError }}
+  </div>
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="form-grid" novalidate>
+    <!-- Campo ID -->
+    <div class="form-group">
+      <label for="id">ID del Producto (Numérico) *</label>
+      <input id="id" type="number" formControlName="id" class="form-control" [class.is-invalid]="esCampoInvalido('id')">
+      <span *ngIf="esCampoInvalido('id')" class="msg-error">El ID es obligatorio y debe ser mayor a 0.</span>
+    </div>
+
+    <!-- Campo Nombre -->
+    <div class="form-group">
+      <label for="nombre">Nombre del Producto *</label>
+      <input id="nombre" type="text" formControlName="nombre" class="form-control" [class.is-invalid]="esCampoInvalido('nombre')">
+      <span *ngIf="esCampoInvalido('nombre')" class="msg-error">El nombre es obligatorio (mínimo 3 caracteres).</span>
+    </div>
+
+    <!-- Campo Precio -->
+    <div class="form-group">
+      <label for="precio">Precio Unitario (MXN) *</label>
+      <input id="precio" type="number" step="0.01" formControlName="precio" class="form-control" [class.is-invalid]="esCampoInvalido('precio')">
+      <span *ngIf="esCampoInvalido('precio')" class="msg-error">El precio es obligatorio y no puede ser negativo.</span>
+    </div>
+<!-- Campo Existencia -->
+    <div class="form-group">
+      <label for="existencia">Existencia Inicial en Bodega *</label>
+      <input id="existencia" type="number" formControlName="existencia" class="form-control" [class.is-invalid]="esCampoInvalido('existencia')">
+      <span *ngIf="esCampoInvalido('existencia')" class="msg-error">La existencia no puede ser menor a 0.</span>
+    </div>
+
+    <div class="form-acciones">
+      <a routerLink="/productos" class="btn-cancelar">Cancelar</a>
+      <button type="submit" [disabled]="guardando" class="btn-guardar">
+        {{ guardando ? 'Guardando...' : 'Guardar Producto' }}
+      </button>
+    </div>
+  </form>
+</section>
