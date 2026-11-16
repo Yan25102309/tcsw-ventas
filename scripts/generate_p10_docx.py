@@ -6,7 +6,8 @@ Práctica P10 (Cliente Angular) - Módulo M13 - TCSW-19234
 Equipo E05 - Integrante 1: Victor Gustavo Reyes Vidal (Novaxll)
 
 Replica de forma exacta la tipografía, paleta cromática, geometría y estructura
-estandarizada en las entregas del equipo (P09_EQUIPO_E05.pdf).
+estandarizada en las entregas del equipo (P09_EQUIPO_E05.pdf), e incrusta las
+capturas reales de evidencia de las Figuras 1 a 6.
 """
 
 import os
@@ -14,9 +15,9 @@ import shutil
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor, Mm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
-from docx.oxml import parse_xml, OxmlElement
-from docx.oxml.ns import nsdecls, qn
+from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
 
 # --- CONSTANTES DE COLOR Y ESTILO ---
 COLOR_NAVY_HEADER = "1F4E78"        # Fondo de cabeceras de tablas Ghostty y Review
@@ -28,7 +29,7 @@ COLOR_MUTED = RGBColor(0x77, 0x77, 0x77)        # Texto guía en placeholders
 COLOR_WHITE = RGBColor(0xFF, 0xFF, 0xFF)        # Texto blanco sobre cabeceras navy
 COLOR_ZEBRA = "F4F5F9"                          # Fila alterna en tablas y label de metadatos
 COLOR_BORDER_METADATA = "B0C3DE"                # Borde tabla metadatos
-COLOR_BORDER_GENERAL = "D3D3D3"                 # Borde tablas generales y placeholders
+COLOR_BORDER_GENERAL = "D3D3D3"                 # Borde tablas generales
 
 def apply_font(run, name="Arial", size_pt=10.5, bold=False, italic=False, color_rgb=None):
     """Garantiza la tipografía Arial en Word en todos los motores de renderizado."""
@@ -39,7 +40,6 @@ def apply_font(run, name="Arial", size_pt=10.5, bold=False, italic=False, color_
     if color_rgb:
         run.font.color.rgb = color_rgb
     
-    # Inyección directa a w:rFonts para evitar fallbacks en Word macOS/Windows
     rPr = run._element.get_or_add_rPr()
     rFonts = parse_xml(f'<w:rFonts {nsdecls("w")} w:ascii="{name}" w:hAnsi="{name}" w:cs="{name}"/>')
     rPr.append(rFonts)
@@ -114,18 +114,15 @@ def add_artifact_bullet(doc, title, description):
     p.paragraph_format.space_after = Pt(4)
     p.paragraph_format.line_spacing = 1.25
     
-    # Nombre del archivo
     r_title = p.add_run(title)
     apply_font(r_title, name="Arial", size_pt=11.0, bold=True, color_rgb=COLOR_NAVY_BULLET)
     
-    # Descripción técnica
     r_desc = p.add_run(" " + description)
     apply_font(r_desc, name="Arial", size_pt=11.0, bold=False, color_rgb=RGBColor(0x00, 0x00, 0x00))
     return p
 
-def add_figure_placeholder(doc, fig_number, caption_text, width_in=6.27, image_path=None):
-    """Inserta rótulo de figura ARRIBA y contenedor de captura con marco sutil."""
-    # Rótulo de figura arriba
+def add_figure(doc, fig_number, caption_text, image_path=None, width_in=6.27):
+    """Inserta rótulo de figura ARRIBA e incrusta la imagen limpia centrada (o placeholder si no existe)."""
     p_cap = doc.add_paragraph()
     p_cap.paragraph_format.space_before = Pt(14)
     p_cap.paragraph_format.space_after = Pt(4)
@@ -133,24 +130,25 @@ def add_figure_placeholder(doc, fig_number, caption_text, width_in=6.27, image_p
     r_cap = p_cap.add_run(f"Figura {fig_number}. {caption_text}")
     apply_font(r_cap, name="Arial", size_pt=10.0, bold=True, color_rgb=COLOR_CAPTION)
     
-    # Contenedor visual
-    tbl = doc.add_table(rows=1, cols=1)
-    tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_borders(tbl, color=COLOR_BORDER_GENERAL, sz="6", val="dashed")
-    cell = tbl.cell(0, 0)
-    cell.width = Inches(width_in)
-    set_cell_background(cell, "FAFAFA")
-    set_cell_margins(cell, top=240, bottom=240, left=200, right=200)
-    
-    p_box = cell.paragraphs[0]
-    p_box.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_box.paragraph_format.space_before = Pt(0)
-    p_box.paragraph_format.space_after = Pt(0)
-    
     if image_path and os.path.exists(image_path):
-        run_img = p_box.add_run()
-        run_img.add_picture(image_path, width=Inches(min(width_in - 0.2, 5.8)))
+        p_img = doc.add_paragraph()
+        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.paragraph_format.space_before = Pt(4)
+        p_img.paragraph_format.space_after = Pt(12)
+        r_img = p_img.add_run()
+        r_img.add_picture(image_path, width=Inches(width_in))
     else:
+        tbl = doc.add_table(rows=1, cols=1)
+        tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+        set_table_borders(tbl, color=COLOR_BORDER_GENERAL, sz="6", val="dashed")
+        cell = tbl.cell(0, 0)
+        cell.width = Inches(width_in)
+        set_cell_background(cell, "FAFAFA")
+        set_cell_margins(cell, top=240, bottom=240, left=200, right=200)
+        p_box = cell.paragraphs[0]
+        p_box.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_box.paragraph_format.space_before = Pt(0)
+        p_box.paragraph_format.space_after = Pt(0)
         r_box = p_box.add_run(f"[ESPACIO PARA CAPTURA DE PANTALLA: Figura {fig_number}]\n({caption_text})")
         apply_font(r_box, name="Arial", size_pt=9.5, italic=True, color_rgb=COLOR_MUTED)
 
@@ -159,14 +157,13 @@ def create_document():
     
     # --- CONFIGURACIÓN DE PÁGINA (A4, márgenes 1 in) ---
     section = doc.sections[0]
-    section.page_width = Mm(210)       # 210 mm
-    section.page_height = Mm(297)      # 297 mm
+    section.page_width = Mm(210)
+    section.page_height = Mm(297)
     section.top_margin = Inches(1.0)
     section.bottom_margin = Inches(1.0)
     section.left_margin = Inches(1.0)
     section.right_margin = Inches(1.0)
     
-    # Limpiar encabezados y pies de página
     header = section.header
     header.is_linked_to_previous = False
     for p in header.paragraphs:
@@ -200,14 +197,12 @@ def create_document():
         ("URL del último PR", "https://github.com/Yan25102309/tcsw-ventas/pull/64"),
         ("Último SHA-1 del PR", "1ca5a7454a08d5be198faefa98b495969404c63f")
     ]
-    
     col_widths_meta = [Inches(1.95), Inches(4.32)]
     
     for row_idx, (label, value) in enumerate(meta_data):
         row = tbl_meta.rows[row_idx]
         set_row_properties(row)
         
-        # Columna 1: Label
         cell_lbl = row.cells[0]
         cell_lbl.width = col_widths_meta[0]
         set_cell_background(cell_lbl, COLOR_ZEBRA)
@@ -218,7 +213,6 @@ def create_document():
         r_l = p_l.add_run(label)
         apply_font(r_l, name="Arial", size_pt=10.5, bold=True, color_rgb=COLOR_TEXT_BODY)
         
-        # Columna 2: Value
         cell_val = row.cells[1]
         cell_val.width = col_widths_meta[1]
         set_cell_background(cell_val, "FFFFFF")
@@ -243,7 +237,6 @@ def create_document():
     )
     apply_font(r_intro1, name="Arial", size_pt=10.5, color_rgb=COLOR_TEXT_BODY)
     
-    # Viñetas de entregables
     add_artifact_bullet(doc, "producto.model.ts:",
         "Objetos de Transferencia de Datos (DTOs) e interfaces TypeScript que modelan el contrato formal expuesto "
         "por la API en OpenAPI 3.1.0. Define Producto (id, nombre, precio, existencia, activo, categoria) y "
@@ -288,8 +281,9 @@ def create_document():
         "Configuración de Angular CLI 16.2.0, soporte headless en Karma sobre Chromium, y proxy inverso redirigiendo "
         "llamadas locales /api hacia http://localhost:8080 para evadir restricciones de CORS en desarrollo.")
 
-    # Figura 1: Issue #62
-    add_figure_placeholder(doc, 1, "Issue #62 registrado y asignado a Victor Reyes en GitHub")
+    # Figura 1: Issue #62 (Incrusta captura real extraída)
+    add_figure(doc, 1, "Issue #62 registrado y asignado a Victor Reyes en GitHub",
+               image_path="docs/evidencias/figura1_issue62.png", width_in=6.27)
     
     # Subtítulo bitácora Ghostty
     p_sub_ghostty = doc.add_paragraph()
@@ -306,7 +300,6 @@ def create_document():
     
     ghostty_widths = [Inches(3.47), Inches(2.80)]
     
-    # Header Ghostty
     hdr_row = tbl_ghostty.rows[0]
     set_row_properties(hdr_row, is_header=True)
     hdr_titles = ["Comando Ejecutado (Ghostty)", "Propósito Técnico en el Flujo"]
@@ -341,7 +334,6 @@ def create_document():
         set_row_properties(row)
         bg = COLOR_ZEBRA if row_idx % 2 == 1 else "FFFFFF"
         
-        # Columna 1: Comando
         c1 = row.cells[0]
         c1.width = ghostty_widths[0]
         set_cell_background(c1, bg)
@@ -352,7 +344,6 @@ def create_document():
         r1 = p1.add_run(cmd)
         apply_font(r1, name="Arial", size_pt=9.5, color_rgb=COLOR_TEXT_BODY)
         
-        # Columna 2: Propósito
         c2 = row.cells[1]
         c2.width = ghostty_widths[1]
         set_cell_background(c2, bg)
@@ -363,11 +354,13 @@ def create_document():
         r2 = p2.add_run(purp)
         apply_font(r2, name="Arial", size_pt=9.5, color_rgb=COLOR_TEXT_BODY)
 
-    # Figura 2: Tests Karma
-    add_figure_placeholder(doc, 2, "Ejecución exitosa de 'npm test -- --watch=false' (14 pruebas unitarias aprobadas en verde con 100% de cobertura)")
+    # Figura 2: Tests Karma (Incrusta captura real extraída)
+    add_figure(doc, 2, "Ejecución exitosa de 'npm test -- --watch=false' (14 pruebas unitarias aprobadas en verde con 100% de cobertura)",
+               image_path="docs/evidencias/figura2_tests_karma.png", width_in=6.27)
     
-    # Figura 3: PR #64 Merged
-    add_figure_placeholder(doc, 3, "Pull Request #64 abierta y fusionada en GitHub cerrando el Issue #62")
+    # Figura 3: PR #64 Merged (Incrusta captura real extraída)
+    add_figure(doc, 3, "Pull Request #64 abierta y fusionada en GitHub cerrando el Issue #62",
+               image_path="docs/evidencias/figura3_pr64_merged.png", width_in=6.27)
 
     # --- SUBSECCIÓN 2: EVALUACIÓN Y REVISIÓN DE CÓDIGO (ANA MARÍA) ---
     add_heading_1(doc, "2. Evaluación y Revisión (Code Review) de la Pull Request #66 de Ana María (Issue #65 — Formulario Reactivo, Rutas y Reporte P10)")
@@ -429,13 +422,13 @@ def create_document():
             r = p.add_run(val)
             apply_font(r, name="Arial", size_pt=9.0, color_rgb=COLOR_TEXT_BODY)
 
-    # Figura 4: Dictamen Approve
-    img_fig4 = "docs/evidencias/figura4_aprobacion_pr66.png" if os.path.exists("docs/evidencias/figura4_aprobacion_pr66.png") else None
-    add_figure_placeholder(doc, 4, "Dictamen de aprobación formal (Approve) y comentarios registrados en la Pull Request #66 de Ana María", image_path=img_fig4)
+    # Figura 4: Dictamen Approve (Incrusta captura real de GitHub)
+    add_figure(doc, 4, "Dictamen de aprobación formal (Approve) y comentarios registrados en la Pull Request #66 de Ana María",
+               image_path="docs/evidencias/figura4_aprobacion_pr66.png", width_in=5.8)
     
-    # Figura 5: Merge confirmado
-    img_fig5 = "docs/evidencias/figura5_merge_pr66.png" if os.path.exists("docs/evidencias/figura5_merge_pr66.png") else None
-    add_figure_placeholder(doc, 5, "Fusión confirmada (Merged) de la Pull Request #66 de Ana María hacia la rama main", image_path=img_fig5)
+    # Figura 5: Merge confirmado (Incrusta captura real de GitHub)
+    add_figure(doc, 5, "Fusión confirmada (Merged) de la Pull Request #66 de Ana María hacia la rama main",
+               image_path="docs/evidencias/figura5_merge_pr66.png", width_in=5.8)
 
     # --- SUBSECCIÓN 3: VERIFICACIÓN TÉCNICA Y REFLEXIÓN INDIVIDUAL ---
     add_heading_1(doc, "3. Verificación Técnica del Cliente Angular y Reflexión Individual")
@@ -444,15 +437,16 @@ def create_document():
     r_verif = p_verif.add_run(
         "La verificación formal del incremento se sustentó en la compilación determinista del código fuente "
         "TypeScript (npm run build) y la ejecución desasistida de la suite completa de pruebas unitarias "
-        "(npm test -- --watch=false). Las 14 pruebas automatizadas diseñadas con dobles de red HttpTestingController "
-        "certifican el 100% de cobertura en sentencias, ramas y funciones sin dependencia de un backend activo. "
-        "Asimismo, se validó la integración local mediante el proxy inverso proxy.conf.json, confirmando la "
-        "recepción de datos reales desde los endpoints REST expuestos por Spring Boot en /api/v1/productos."
+        "(npm test -- --watch=false). Las 17 pruebas automatizadas integradas certifican el 100% de éxito en "
+        "la suite de pruebas sin dependencia de un backend activo. Asimismo, se validó la integración local "
+        "mediante el proxy inverso proxy.conf.json, confirmando la recepción de datos reales desde los endpoints "
+        "REST expuestos por Spring Boot en /api/v1/productos."
     )
     apply_font(r_verif, name="Arial", size_pt=10.5, color_rgb=COLOR_TEXT_BODY)
     
-    # Figura 6: Verificación y tests
-    add_figure_placeholder(doc, 6, "Suite consolidada de pruebas unitarias y compilación TypeScript exitosa en terminal Ghostty")
+    # Figura 6: Verificación y tests consolidados (Incrusta captura real de suite consolidada)
+    add_figure(doc, 6, "Suite consolidada de pruebas unitarias y compilación TypeScript exitosa en terminal Ghostty",
+               image_path="docs/evidencias/figura6_suite_consolidada.png", width_in=6.27)
     
     # Subtítulo Reflexión
     p_sub_refl = doc.add_paragraph()
