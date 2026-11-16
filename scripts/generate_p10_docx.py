@@ -370,14 +370,14 @@ def create_document():
     add_figure_placeholder(doc, 3, "Pull Request #64 abierta y fusionada en GitHub cerrando el Issue #62")
 
     # --- SUBSECCIÓN 2: EVALUACIÓN Y REVISIÓN DE CÓDIGO (ANA MARÍA) ---
-    add_heading_1(doc, "2. Evaluación y Revisión (Code Review) de la Pull Request de Ana María (Issue #65 — Formulario Reactivo, Rutas y Reporte C04)")
+    add_heading_1(doc, "2. Evaluación y Revisión (Code Review) de la Pull Request #66 de Ana María (Issue #65 — Formulario Reactivo, Rutas y Reporte P10)")
     
     p_intro2 = add_paragraph_styled(doc, space_after=8)
     r_intro2 = p_intro2.add_run(
         "En estricto apego a las directrices de gobernanza de software y la prohibición expresa de autoaprobación "
         "de código, actué como revisor técnico (Code Reviewer) para los incrementos desarrollados por mi compañera "
-        "Ana María Reyes Hernández (Yan25102309) en el marco del Issue #65. A continuación se documenta la auditoría "
-        "exhaustiva línea por línea realizada sobre el formulario reactivo ProductoForm, el módulo de rutas "
+        "Ana María Reyes Hernández (Yan25102309) en el marco del Issue #65 y su Pull Request #66. A continuación "
+        "se documenta la auditoría exhaustiva realizada sobre el formulario reactivo ProductoForm, el módulo de rutas "
         "app.routes.ts, el bootstrapeo de la aplicación y el reporte integrador:"
     )
     apply_font(r_intro2, name="Arial", size_pt=10.5, color_rgb=COLOR_TEXT_BODY)
@@ -406,10 +406,10 @@ def create_document():
     review_data = [
         ("src/app/components/producto-form/producto-form.component.ts", "L. 15-55", "[Revisión]", "Validación estricta con ReactiveFormsModule (FormGroup y FormControl). Control exhaustivo de rangos numéricos (>0) y mensajes declarativos."),
         ("src/app/components/producto-form/producto-form.component.html", "L. 1-45", "[Accesibilidad]", "Cumplimiento WAI-ARIA en controles de entrada (aria-invalid, aria-describedby) y alertas accesibles con role=\"alert\"."),
-        ("src/app/components/producto-form/producto-form.component.spec.ts", "L. 20-65", "[Validación]", "Pruebas unitarias que certifican la invalidación del formulario ante campos vacíos y la emisión tipada del evento de registro."),
+        ("src/app/components/producto-form/producto-form.component.spec.ts", "L. 20-40", "[Validación]", "Pruebas unitarias que certifican la invalidación del formulario ante campos vacíos y la emisión tipada del evento de registro."),
         ("src/app/app.routes.ts", "L. 8-28", "[Validación]", "Configuración del enrutamiento respetando el principio de primera coincidencia: /productos y /productos/nuevo ordenados estrictamente antes del comodín (**)."),
         ("src/app/app.config.ts", "L. 1-15", "[Revisión]", "Configuración centralizada de proveedores con provideRouter y provideHttpClient, garantizando inyección limpia sin módulos obsoletos."),
-        ("docs/C04_reporte_cliente_angular.md", "L. 1-90", "[Validación]", "Excelente documentación integradora con árbol de componentes, matriz formal de rutas y diagrama de interacción en Mermaid (sequenceDiagram).")
+        ("docs/P10_reporte_cliente_angular.md", "L. 1-63", "[Validación]", "Excelente documentación integradora con árbol de componentes, matriz formal de rutas y diagrama de interacción en Mermaid (sequenceDiagram).")
     ]
     
     for row_idx, (arch, linea, clasif, coment) in enumerate(review_data):
@@ -430,10 +430,12 @@ def create_document():
             apply_font(r, name="Arial", size_pt=9.0, color_rgb=COLOR_TEXT_BODY)
 
     # Figura 4: Dictamen Approve
-    add_figure_placeholder(doc, 4, "Dictamen de aprobación formal (Approve) y comentarios inline en la Pull Request de Ana María")
+    img_fig4 = "docs/evidencias/figura4_aprobacion_pr66.png" if os.path.exists("docs/evidencias/figura4_aprobacion_pr66.png") else None
+    add_figure_placeholder(doc, 4, "Dictamen de aprobación formal (Approve) y comentarios registrados en la Pull Request #66 de Ana María", image_path=img_fig4)
     
     # Figura 5: Merge confirmado
-    add_figure_placeholder(doc, 5, "Fusión confirmada (Merged) de la Pull Request de Ana María hacia la rama main")
+    img_fig5 = "docs/evidencias/figura5_merge_pr66.png" if os.path.exists("docs/evidencias/figura5_merge_pr66.png") else None
+    add_figure_placeholder(doc, 5, "Fusión confirmada (Merged) de la Pull Request #66 de Ana María hacia la rama main", image_path=img_fig5)
 
     # --- SUBSECCIÓN 3: VERIFICACIÓN TÉCNICA Y REFLEXIÓN INDIVIDUAL ---
     add_heading_1(doc, "3. Verificación Técnica del Cliente Angular y Reflexión Individual")
