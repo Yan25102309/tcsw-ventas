@@ -115,4 +115,93 @@ describe('ProductosService', () => {
     const req = httpMock.expectOne('/api/v1/productos');
     req.flush('Error interno', { status: 500, statusText: 'Internal Server Error' });
   });
+
+  it('debe devolver mensaje de API desconectada cuando el proxy responde 504 Gateway Timeout', () => {
+    service.obtenerTodos().subscribe({
+      next: () => fail('Debería haber fallado'),
+      error: (err: Error) => {
+        expect(err.message).toBe('No fue posible conectar con la API REST. Verifique su conexión o si el servidor backend está activo.');
+      }
+    });
+
+    const req = httpMock.expectOne('/api/v1/productos');
+    req.flush('Error occurred while trying to proxy: localhost:4200/api/v1/productos', {
+      status: 504,
+      statusText: 'Gateway Timeout'
+    });
+  });
+
+  it('debe devolver mensaje de API desconectada cuando el proxy responde 502 Bad Gateway', () => {
+    service.obtenerTodos().subscribe({
+      next: () => fail('Debería haber fallado'),
+      error: (err: Error) => {
+        expect(err.message).toBe('No fue posible conectar con la API REST. Verifique su conexión o si el servidor backend está activo.');
+      }
+    });
+
+    const req = httpMock.expectOne('/api/v1/productos');
+    req.flush('Bad Gateway', { status: 502, statusText: 'Bad Gateway' });
+  });
+
+  it('debe devolver mensaje de API desconectada cuando el proxy responde 500 en texto plano de proxy', () => {
+    service.obtenerTodos().subscribe({
+      next: () => fail('Debería haber fallado'),
+      error: (err: Error) => {
+        expect(err.message).toBe('No fue posible conectar con la API REST. Verifique su conexión o si el servidor backend está activo.');
+      }
+    });
+
+    const req = httpMock.expectOne('/api/v1/productos');
+    req.flush('Error occurred while trying to proxy: localhost:4200/api/v1/productos', {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+  });
+
+  it('debe devolver mensaje de API desconectada cuando el proxy responde 500 con ECONNREFUSED o Proxy error', () => {
+    service.obtenerTodos().subscribe({
+      next: () => fail('Debería haber fallado'),
+      error: (err: Error) => {
+        expect(err.message).toBe('No fue posible conectar con la API REST. Verifique su conexión o si el servidor backend está activo.');
+      }
+    });
+
+    const req = httpMock.expectOne('/api/v1/productos');
+    req.flush('Proxy error: Could not proxy request /api/v1/productos (ECONNREFUSED)', {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+  });
+
+  it('debe preservar el detalle RFC 9457 cuando la API real responde 500 con detail', () => {
+    const errorBody = {
+      type: 'https://tcsw-ventas.invalid/errors/persistence-failure',
+      title: 'Fallo de Persistencia',
+      status: 500,
+      detail: 'Error en la capa de datos. Verifique la consistencia del registro.',
+      instance: '/api/v1/productos'
+    };
+
+    service.obtenerTodos().subscribe({
+      next: () => fail('Debería haber fallado'),
+      error: (err: Error) => {
+        expect(err.message).toBe('Error en la capa de datos. Verifique la consistencia del registro.');
+      }
+    });
+
+    const req = httpMock.expectOne('/api/v1/productos');
+    req.flush(errorBody, { status: 500, statusText: 'Internal Server Error' });
+  });
+
+  it('debe devolver mensaje genérico cuando la API responde 500 JSON sin campo detail', () => {
+    service.obtenerTodos().subscribe({
+      next: () => fail('Debería haber fallado'),
+      error: (err: Error) => {
+        expect(err.message).toBe('Ocurrió un error inesperado al comunicarse con el servidor.');
+      }
+    });
+
+    const req = httpMock.expectOne('/api/v1/productos');
+    req.flush({ title: 'Internal Server Error' }, { status: 500, statusText: 'Internal Server Error' });
+  });
 });
