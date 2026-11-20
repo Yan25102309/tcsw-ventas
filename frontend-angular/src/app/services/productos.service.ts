@@ -31,7 +31,12 @@ export class ProductosService {
 
   private manejadorError(error: HttpErrorResponse): Observable<never> {
     let mensaje = 'Ocurrió un error inesperado al comunicarse con el servidor.';
-    if (error.status === 0) {
+    const esErrorProxy =
+      error.status === 500 &&
+      typeof error.error === 'string' &&
+      /error occurr?ed while trying to proxy|proxy error|econnrefused|econnreset|etimedout|enotfound/i.test(error.error);
+
+    if (error.status === 0 || error.status === 502 || error.status === 504 || esErrorProxy) {
       mensaje = 'No fue posible conectar con la API REST. Verifique su conexión o si el servidor backend está activo.';
     } else if (error.error && error.error.detail) {
       mensaje = error.error.detail;
