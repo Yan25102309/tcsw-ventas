@@ -183,10 +183,9 @@ mvn clean package
 
 Esto genera el artefacto ejecutable **`target/tcsw-ventas-1.0.0-RC1.jar`**.
 
-2. Ejecutar el paquete directamente con `java -jar` (sin necesidad de Maven):
+2. Ejecutar el paquete directamente con `java -jar` (sin necesidad de Maven; funciona igual en bash/zsh y PowerShell con las variables de `.env` cargadas en la sesión):
 
 ```bash
-# macOS / Linux (con variables de .env exportadas)
 java -jar target/tcsw-ventas-1.0.0-RC1.jar
 ```
 
@@ -218,7 +217,7 @@ El repositorio incluye el flujo automatizado [`.github/workflows/ci.yml`](.githu
    - Levanta un servicio efímero `postgres:16-alpine` con *healthcheck* (`pg_isready`) en el puerto `5434`.
    - Inicializa el esquema relacional aplicando `infrastructure/database/001_schema.sql` y `infrastructure/database/002_schema_venta.sql`.
    - Ejecuta `mvn -B clean test -Djava.awt.headless=true` (pruebas unitarias de dominio y aplicación, reglas hexagonales `ArchitectureTest` con ArchUnit, controladores REST `MockMvc`, pruebas Swing *headless* e integración real JDBC/Hibernate sobre PostgreSQL 16).
-   - Empaqueta el JAR ejecutable con `mvn -B package -DskipTests` y verifica que `target/tcsw-ventas-1.0.0-RC1.jar` contenga la estructura reempaquetada de Spring Boot (`BOOT-INF/classes/infrastructure/RestApp.class`).
+   - Empaqueta el JAR ejecutable con `mvn -B package -DskipTests`, resuelve dinámicamente la versión desde `pom.xml`, verifica la estructura reempaquetada de Spring Boot (`BOOT-INF/classes/infrastructure/RestApp.class`) y ejecuta un *smoke test* en vivo arrancando `java -jar` contra PostgreSQL 16 para validar `HTTP 200` en `GET /api/v1/productos` y `GET /api-docs`.
 2. **`frontend` (Angular 16 + Karma ChromeHeadless):**
    - Instala dependencias reproducibles con `npm ci` en Node.js 20 LTS.
    - Ejecuta la suite de pruebas unitarias con `npm test -- --watch=false --browsers=ChromeHeadless`.
