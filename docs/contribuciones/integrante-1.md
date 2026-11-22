@@ -18,8 +18,8 @@
 | **P10 — Revisión Formulario Reactivo y Rutas** | PR #66 | `feat/p10-angular-formulario-rutas-reporte` | `ad5e733` | Revisor y merge a `main` |
 | **P10 — Documentación Individual** | — | `main` | `918f942` | Autor (`P10_contribucion_Estudiante1.md`, `P10_Seccion_IV_Victor_Reyes.docx`) |
 | **C03 — Cierre de Integración Web** | Issue #67 / PR #68 (`v0.3-web`) | `feat/c03-integracion-web-resiliencia` | `075061d` (merge `7127580`) | Autor |
-| **C04 — Pipeline CI en GitHub Actions** | Issue #71 / PR abierto (revisión `Yan25102309`) | `feat/c04-ci-empaquetado-rc` | En revisión hacia `main` (`v1.0-rc`) | Autor |
-| **C04 — Versiones RC, Empaquetado JAR y Docs** | Issue #72 / PR abierto (revisión `Yan25102309`) | `feat/c04-ci-empaquetado-rc` | En revisión hacia `main` (`v1.0-rc`) | Autor |
+| **C04 — Pipeline CI en GitHub Actions** | Issue #71 / PR #73 (en revisión por `Yan25102309`) | `feat/c04-ci-empaquetado-rc` | `ba96031` | Autor |
+| **C04 — Versiones RC, Empaquetado JAR y Docs** | Issue #72 / PR #73 (en revisión por `Yan25102309`) | `feat/c04-ci-empaquetado-rc` | `4d35bfe`, `4428c99` | Autor |
 
 ---
 
@@ -86,4 +86,4 @@
   - `cd frontend-angular && npm ci` -> instalación limpia sin errores (989 paquetes).
   - `npm test -- --watch=false --browsers=ChromeHeadless` -> **23/23 SUCCESS**.
   - `npm run build` -> compilación de producción exitosa (`dist/frontend-angular/`, bundle inicial 277.04 kB, 0 errores).
-- **Integración Continua en GitHub Actions:** Verificación automatizada sobre el PR abierto hacia `main` (`backend` + `frontend` en estado verde).
+- **Integración Continua en GitHub Actions (PR #73):** Pipeline `CI - tcsw-ventas` ejecutado en verde ([Run #45065617457](https://github.com/Yan25102309/tcsw-ventas/actions/runs/45065617457)): `Backend (Java 11 + Maven + PostgreSQL 16)` ✓ y `Frontend (Angular 16 + Karma ChromeHeadless)` ✓.
