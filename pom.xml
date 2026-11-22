@@ -6,7 +6,7 @@
 
     <groupId>mx.uv</groupId>
     <artifactId>tcsw-ventas</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-RC1</version>
 
     <properties>
         <!-- Forzamos compilar y empaquetar estrictamente para Java 11 -->
@@ -92,7 +92,7 @@
 
     <build>
         <plugins>
-            <!-- Plugin Spring Boot para ejecutar la API con mvn spring-boot:run -->
+            <!-- Plugin Spring Boot para ejecutar la API con mvn spring-boot:run y empaquetar JAR ejecutable -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -100,6 +100,13 @@
                 <configuration>
                     <mainClass>infrastructure.RestApp</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-- Plugin Surefire para que Maven reconozca y ejecute los tests -->
             <plugin>
