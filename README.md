@@ -7,7 +7,7 @@
 
 **Experiencia Educativa:** Tecnologías para la Construcción de Software (NRC 19234)  
 **Docente:** Dr. Gabriel Rodríguez Vásquez  
-**Corte actual:** C03 — Integración Web (`v0.3-web`)
+**Corte actual:** C04 — Candidato de liberación (`v1.0-rc` · Backend `1.0.0-RC1` · Frontend `1.0.0-rc.1`)
 
 ---
 
@@ -143,26 +143,116 @@ mvn test -Dtest=ArchitectureTest,ProductoRestControllerTest,VentaRestControllerT
 Desde `frontend-angular/`:
 
 ```bash
-# Pruebas unitarias en Karma + ChromeHeadless (una sola ejecución)
-npm test -- --watch=false
+# Instalación reproducible desde package-lock.json
+npm ci
 
-# Equivalente explícito con navegador headless
+# Pruebas unitarias en Karma + ChromeHeadless (una sola ejecución)
 npm test -- --watch=false --browsers=ChromeHeadless
 
-# Compilación de producción
+# Compilación de producción (genera frontend-angular/dist/frontend-angular/)
 npm run build
 ```
 
 ---
 
-## 6. Estructura del Proyecto
+## 6. Empaquetado Reproducible del Candidato de Liberación (`v1.0-rc`)
+
+Las versiones de ambos módulos están congeladas para el candidato de liberación (sin sufijos `-SNAPSHOT`):
+- **Backend (`pom.xml`):** `1.0.0-RC1`
+- **Frontend (`frontend-angular/package.json` y `package-lock.json`):** `1.0.0-rc.1`
+
+### 6.1 Backend — JAR Ejecutable (*Fat JAR* con Spring Boot)
+
+El plugin `spring-boot-maven-plugin` ejecuta el objetivo `repackage` durante la fase `package` tomando `infrastructure.RestApp` como clase principal.
+
+1. Compilar, ejecutar la suite completa de pruebas y empaquetar desde limpio (con PostgreSQL activo y variables de `.env` cargadas):
+
+```bash
+# macOS / Linux (bash/zsh)
+set -a && source .env && set +a
+mvn clean package
+```
+
+```powershell
+# Windows (PowerShell)
+Get-Content .env | ForEach-Object {
+  if ($_ -match '^([^=]+)=(.*)$') { [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process') }
+}
+mvn clean package
+```
+
+Esto genera el artefacto ejecutable **`target/tcsw-ventas-1.0.0-RC1.jar`**.
+
+2. Ejecutar el paquete directamente con `java -jar` (sin necesidad de Maven):
+
+```bash
+# macOS / Linux (con variables de .env exportadas)
+java -jar target/tcsw-ventas-1.0.0-RC1.jar
+```
+
+3. Verificar el servicio empaquetado (*smoke test*):
+
+```bash
+curl -i http://localhost:8080/api/v1/productos
+# Esperado: HTTP/1.1 200 OK con el catálogo JSON de productos
+```
+
+### 6.2 Frontend — Build de Producción Angular (`dist/`)
+
+Desde `frontend-angular/`:
+
+```bash
+npm ci
+npm run build
+```
+
+El compilado optimizado con *output hashing* y división de *chunks lazy* se genera en **`frontend-angular/dist/frontend-angular/`** (con punto de entrada `index.html`), listo para ser servido por cualquier servidor web estático (Nginx, Caddy, Apache) con proxy inverso de `/api/*` hacia la API REST.
+
+---
+
+## 7. Integración Continua (GitHub Actions)
+
+El repositorio incluye el flujo automatizado [`.github/workflows/ci.yml`](.github/workflows/ci.yml), el cual se ejecuta en cada `push` y `pull_request` hacia la rama `main` con dos *jobs* independientes:
+
+1. **`backend` (Java 11 + Maven + PostgreSQL 16):**
+   - Levanta un servicio efímero `postgres:16-alpine` con *healthcheck* (`pg_isready`) en el puerto `5434`.
+   - Inicializa el esquema relacional aplicando `infrastructure/database/001_schema.sql` y `infrastructure/database/002_schema_venta.sql`.
+   - Ejecuta `mvn -B clean test -Djava.awt.headless=true` (pruebas unitarias de dominio y aplicación, reglas hexagonales `ArchitectureTest` con ArchUnit, controladores REST `MockMvc`, pruebas Swing *headless* e integración real JDBC/Hibernate sobre PostgreSQL 16).
+   - Empaqueta el JAR ejecutable con `mvn -B package -DskipTests` y verifica que `target/tcsw-ventas-1.0.0-RC1.jar` contenga la estructura reempaquetada de Spring Boot (`BOOT-INF/classes/infrastructure/RestApp.class`).
+2. **`frontend` (Angular 16 + Karma ChromeHeadless):**
+   - Instala dependencias reproducibles con `npm ci` en Node.js 20 LTS.
+   - Ejecuta la suite de pruebas unitarias con `npm test -- --watch=false --browsers=ChromeHeadless`.
+   - Valida el empaquetado de producción con `npm run build` verificando la generación de `dist/frontend-angular/index.html`.
+
+---
+
+## 8. Procedimiento de Reversa (*Rollback*) y Notas de Versión
+
+En caso de detectar regresiones críticas tras desplegar el candidato de liberación `v1.0-rc`, la línea base estable anterior para reversa es la etiqueta **`v0.3-web`**:
+
+```bash
+# Referencia rápida para restaurar el código fuente a la versión estable previa
+git fetch --tags
+git checkout v0.3-web
+```
+
+Para el procedimiento completo de reversa (criterios de activación, respaldo/restauración de base de datos PostgreSQL, verificación posterior y responsables) y el registro de cambios del corte, consulta:
+- `docs/PLAN_REVERSA_ROLLBACK.md` — Plan formal de reversa (*rollback*) del Corte C04.
+- `CHANGELOG.md` — Historial de cambios por versión y corte.
+
+---
+
+## 9. Estructura del Proyecto
 
 ```text
 tcsw-ventas/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                             # Pipeline CI en GitHub Actions (Backend + Frontend)
 ├── .env.example                               # Plantilla segura de variables de entorno
 ├── .gitignore                                 # Reglas de exclusión (permite !.env.example)
 ├── compose.yml                                # Servicio PostgreSQL 16 (puerto 5434)
-├── pom.xml                                    # Descriptor Maven (Java 11, Spring Boot 2.7.18, JUnit 5, ArchUnit)
+├── pom.xml                                    # Descriptor Maven (1.0.0-RC1, Java 11, Spring Boot 2.7.18, repackage JAR)
 ├── README.md                                  # Guía principal del proyecto
 ├── infrastructure/
 │   └── database/
@@ -185,7 +275,7 @@ tcsw-ventas/
 ├── frontend-angular/
 │   ├── angular.json                           # Configuración Angular CLI 16 (proxyConfig en serve)
 │   ├── karma.conf.js                          # Configuración Karma / ChromeHeadless
-│   ├── package.json                           # Dependencias y scripts npm
+│   ├── package.json                           # Dependencias y scripts npm (versión 1.0.0-rc.1)
 │   ├── proxy.conf.json                        # Proxy /api -> http://localhost:8080
 │   └── src/app/
 │       ├── app.config.ts                      # Providers de router y HttpClient
