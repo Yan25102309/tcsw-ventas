@@ -1,10 +1,10 @@
-# Reporte de Contribución Individual — Integrante 1 (P09, P10 y C03)
+# Reporte de Contribución Individual — Integrante 1 (P09, P10, C03 y C04)
 
 * **Estudiante:** Victor Gustavo Reyes Vidal (`Novaxll` — Integrante 1)
 * **Equipo:** TCSW-E05
 * **Experiencia Educativa:** Tecnologías para la Construcción de Software (NRC 19234)
 * **Docente:** Dr. Gabriel Rodríguez Vásquez
-* **Corte / Hito:** C03 — Integración Web (`v0.3-web`)
+* **Corte / Hito actual:** C04 — Candidato de liberación (`v1.0-rc`)
 
 ---
 
@@ -17,7 +17,9 @@
 | **P10 — Cliente Angular (Servicio y Listado)** | Issue #62 / PR #64 | `feat/p10-angular-servicio-productos-listado` | `1ca5a74` (merge `2fa2ed3`) | Autor / Co-autor |
 | **P10 — Revisión Formulario Reactivo y Rutas** | PR #66 | `feat/p10-angular-formulario-rutas-reporte` | `ad5e733` | Revisor y merge a `main` |
 | **P10 — Documentación Individual** | — | `main` | `918f942` | Autor (`P10_contribucion_Estudiante1.md`, `P10_Seccion_IV_Victor_Reyes.docx`) |
-| **C03 — Cierre de Integración Web** | Issue #67 / PR pendiente de revisión | `feat/c03-integracion-web-resiliencia` | En curso hacia `main` (`v0.3-web`) | Autor |
+| **C03 — Cierre de Integración Web** | Issue #67 / PR #68 (`v0.3-web`) | `feat/c03-integracion-web-resiliencia` | `075061d` (merge `7127580`) | Autor |
+| **C04 — Pipeline CI en GitHub Actions** | Issue #71 / PR #73 (en revisión por `Yan25102309`) | `feat/c04-ci-empaquetado-rc` | Ver commits del PR #73 (`ba96031` y endurecimiento CI) | Autor |
+| **C04 — Versiones RC, Empaquetado JAR y Docs** | Issue #72 / PR #73 (en revisión por `Yan25102309`) | `feat/c04-ci-empaquetado-rc` | Ver commits del PR #73 (`4d35bfe`, `4428c99`, `8a2b646` y actualización final) | Autor |
 
 ---
 
@@ -48,6 +50,18 @@
    - Actualización integral de `README.md` con guía paso a paso para PostgreSQL 16 (`docker compose up -d`), API REST Spring Boot (`mvn spring-boot:run`), cliente Angular (`npm start`), Swagger UI y ejecución de pruebas.
    - Limpieza de archivo temporal no rastreado (`test_out.docx`).
 
+### 2.4 Corte C04 — Candidato de Liberación (`v1.0-rc`: CI, Versiones Congeladas y Empaquetado)
+1. **Pipeline de Integración Continua (`.github/workflows/ci.yml` — Issue #71):**
+   - Configuración de GitHub Actions disparado en `push` y `pull_request` hacia `main` con permisos mínimos (`contents: read`), control de `concurrency` en ramas de PR y acciones oficiales actualizadas a Node 24 (`actions/checkout@v6`, `actions/setup-java@v6`, `actions/setup-node@v6`, sin advertencias de deprecación).
+   - Job `backend`: servicio PostgreSQL 16 (`postgres:16-alpine`) con *healthcheck* (`pg_isready`), inicialización automática de `infrastructure/database/001_schema.sql` y `infrastructure/database/002_schema_venta.sql`, JDK 11 (`temurin`) con caché Maven, ejecución de `mvn -B clean test -Djava.awt.headless=true` (unitarias, ArchUnit, MockMvc, Swing headless, JDBC/Hibernate), empaquetado con `mvn -B package -DskipTests` resolviendo dinámicamente la versión desde `pom.xml`, verificación del *fat JAR* (`BOOT-INF/classes/infrastructure/RestApp.class`) y *smoke test* real arrancando `java -jar` contra PostgreSQL 16 (`GET /api/v1/productos` y `GET /api-docs` respondiendo `HTTP 200`).
+   - Job `frontend`: Node.js 20 LTS con caché npm, instalación determinista `npm ci`, pruebas unitarias `npm test -- --watch=false --browsers=ChromeHeadless` y compilación de producción `npm run build` verificando `dist/frontend-angular/index.html`.
+2. **Congelamiento de Versiones y Empaquetado Reproducible (`pom.xml`, `frontend-angular/package.json`, `frontend-angular/package-lock.json` — Issue #72):**
+   - Congelamiento de la versión del artefacto Maven de `1.0-SNAPSHOT` a `1.0.0-RC1`.
+   - Incorporación de la ejecución `<goal>repackage</goal>` en `spring-boot-maven-plugin` (`mainClass: infrastructure.RestApp`) para que `mvn clean package` genere el *fat JAR* ejecutable `target/tcsw-ventas-1.0.0-RC1.jar` ejecutable mediante `java -jar`.
+   - Congelamiento de la versión del cliente Angular a `1.0.0-rc.1` en `package.json` y sincronización exacta en `package-lock.json`.
+3. **Actualización de Documentación Técnica (`README.md` y `docs/contribuciones/integrante-1.md` — Issue #72):**
+   - Incorporación en `README.md` de las guías reproducibles de empaquetado (`mvn clean package`, `java -jar target/tcsw-ventas-1.0.0-RC1.jar`, `npm ci && npm run build`), resumen del pipeline de GitHub Actions y referencia al plan de reversa (*rollback* hacia `v0.3-web`, delegando `CHANGELOG.md`, `docs/PLAN_REVERSA_ROLLBACK.md` y `docs/contribuciones/integrante-2.md` al PR del Integrante 2).
+
 ---
 
 ## 3. Verificación Ejecutada en C03
@@ -59,3 +73,18 @@
   - Registro de producto en `/productos/nuevo`, reinicio completo de `RestApp` (nueva JVM en puerto `8080`), verificación `200 OK` vía proxy Angular y consulta directa en PostgreSQL (`tcsw_ventas_db`).
   - Casos validados en vivo en navegador: catálogo con datos y alerta de stock bajo (`< 5`), estado vacío (`empty`: `No hay productos registrados en la base de datos.`), validaciones reactivas de formulario, Swagger UI (`/swagger-ui/index.html`) y error controlado con API apagada (`504` de proxy mapeado a mensaje amigable con botón `Reintentar`).
   - Respuestas RFC 9457 (`400 Bad Request` y `409 Conflict` en `POST /api/v1/ventas`) y `404` verificadas vía `curl`.
+
+---
+
+## 4. Verificación Ejecutada en C04
+
+- **Backend — Compilación limpia, pruebas y empaquetado JAR:** `mvn -B clean package` contra PostgreSQL 16 en Docker (`tcsw_ventas_db`) -> **BUILD SUCCESS (79/79 pruebas pasadas, 0 fallos, 0 errores)** y generación del *fat JAR* reempaquetado `target/tcsw-ventas-1.0.0-RC1.jar` (~38 MB).
+- **Backend — Arranque real con `java -jar`:** Ejecución directa de `java -jar target/tcsw-ventas-1.0.0-RC1.jar` con variables de `.env` exportadas; verificación con `curl`:
+  - `GET http://localhost:8080/api/v1/productos` -> **`HTTP 200 OK`** devolviendo el catálogo JSON desde PostgreSQL.
+  - `GET http://localhost:8080/api-docs` y `GET http://localhost:8080/swagger-ui/index.html` -> **`HTTP 200 OK`**.
+  - Arranque sin `DB_PASSWORD` -> falla controlada en `DatabaseConfig` sin iniciar el servidor de forma insegura.
+- **Frontend — Instalación limpia, pruebas unitarias y build de producción:**
+  - `cd frontend-angular && npm ci` -> instalación limpia sin errores (989 paquetes).
+  - `npm test -- --watch=false --browsers=ChromeHeadless` -> **23/23 SUCCESS**.
+  - `npm run build` -> compilación de producción exitosa (`dist/frontend-angular/`, bundle inicial 277.04 kB, 0 errores).
+- **Integración Continua en GitHub Actions (PR #73):** Pipeline `CI - tcsw-ventas` ejecutado en verde sin advertencias de deprecación ([Checks del PR #73](https://github.com/Yan25102309/tcsw-ventas/pull/73/checks) · [Historial del workflow `ci.yml`](https://github.com/Yan25102309/tcsw-ventas/actions/workflows/ci.yml)): `Backend (Java 11 + Maven + PostgreSQL 16)` (incluyendo *smoke test* real con `java -jar`) ✓ y `Frontend (Angular 16 + Karma ChromeHeadless)` ✓.
