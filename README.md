@@ -236,8 +236,10 @@ git checkout v0.3-web
 ```
 
 Para el procedimiento completo de reversa (criterios de activación, respaldo/restauración de base de datos PostgreSQL, verificación posterior y responsables) y el registro de cambios del corte, consulta:
-- `docs/PLAN_REVERSA_ROLLBACK.md` — Plan formal de reversa (*rollback*) del Corte C04.
-- `CHANGELOG.md` — Historial de cambios por versión y corte.
+- [docs/PLAN_REVERSA_ROLLBACK.md](docs/PLAN_REVERSA_ROLLBACK.md) — Plan formal de reversa (*rollback*) del Corte C04.
+- [CHANGELOG.md](CHANGELOG.md) — Historial de cambios por versión y corte.
+- [docs/ANALISIS_SONARQUBE_C04.md](docs/ANALISIS_SONARQUBE_C04.md) — Estado verificable del análisis estático y métricas C04.
+- [docs/contribuciones/AnaReyesC04-2.md](docs/contribuciones/AnaReyesC04-2.md) — Reporte de contribución individual C04-2.
 
 ---
 
